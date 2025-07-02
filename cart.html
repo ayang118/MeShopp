@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeShopp - Keranjang Belanja</title>
+    <style>
+        :root {
+            --pink: #ff69b4;
+            --pink-dark: #e75480;
+            --bg-dark: #0a0a0a;
+            --bg-dark-alt: #1a1a1a;
+            --white: #fff;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to bottom, var(--bg-dark), var(--bg-dark-alt));
+            margin: 0;
+            padding: 0;
+            color: var(--pink);
+            scroll-behavior: smooth;
+        }
+        header {
+            background: linear-gradient(to right, var(--bg-dark), var(--bg-dark-alt));
+            color: var(--pink);
+            padding: 20px;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(255,105,180,0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        main {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        #back-btn {
+            display: inline-block;
+            background: var(--pink);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.1s;
+            margin: 20px 0;
+        }
+        #back-btn:hover {
+            background: var(--pink-dark);
+        }
+        #back-btn:active {
+            transform: scale(0.97);
+        }
+        ul#cart-items {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        ul#cart-items li {
+            background: #111;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(255,105,180,0.3);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        ul#cart-items li:active {
+            transform: scale(0.98);
+        }
+        ul#cart-items li img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 10px;
+            border: 2px solid var(--pink);
+            flex-shrink: 0;
+        }
+        ul#cart-items li span {
+            flex: 1;
+            color: var(--white);
+            font-size: 0.95em;
+        }
+        ul#cart-items li button.remove-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3em;
+            margin-left: 8px;
+            color: var(--pink);
+            transition: transform 0.2s;
+        }
+        ul#cart-items li button.remove-btn:hover {
+            transform: scale(1.2);
+        }
+        ul#cart-items li button.remove-btn::after {
+            content: '🗑️';
+        }
+        #cart-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        #cart-total {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: var(--pink);
+            margin-bottom: 10px;
+        }
+        #checkout-btn {
+            background: var(--pink);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s, transform 0.1s;
+        }
+        #checkout-btn:hover {
+            background: var(--pink-dark);
+        }
+        #checkout-btn:active {
+            transform: scale(0.97);
+        }
+        #empty-message {
+            color: var(--pink);
+            font-style: italic;
+            margin-top: 40px;
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            header {
+                font-size: 1.5em;
+            }
+            #back-btn, #checkout-btn {
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+                font-size: 1em;
+            }
+            #cart-total {
+                font-size: 1.2em;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            ul#cart-items li img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>🛒 MeShopp - Keranjang</header>
+    <main>
+        <a href="katalog.html" id="back-btn">← Kembali Belanja</a>
+        <ul id="cart-items"></ul>
+        <div id="cart-footer">
+            <div id="cart-total">Total: Rp 0</div>
+            <button id="checkout-btn">Pesan via WhatsApp</button>
+        </div>
+        <div id="empty-message" style="display:none;">Keranjang masih kosong.</div>
+    </main>
+
+    <script>
+        const phone = '6285891941068';
+        const BASE_URL = 'https://fatimaazhr.psl17.my.id/';
+
+        function getCart() {
+            return JSON.parse(localStorage.getItem('cart') || '[]');
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function renderCart() {
+            const cart = getCart();
+            const cartItemsEl = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const emptyMessage = document.getElementById('empty-message');
+
+            cartItemsEl.innerHTML = '';
+
+            if (cart.length === 0) {
+                checkoutBtn.style.display = 'none';
+                cartTotalEl.style.display = 'none';
+                emptyMessage.style.display = 'block';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                const li = document.createElement('li');
+                const subTotal = item.price * item.qty;
+                total += subTotal;
+
+                const img = document.createElement('img');
+                if (item.photo) {
+                    if (item.photo.startsWith('http')) {
+                        img.src = item.photo;
+                    } else {
+                        img.src = BASE_URL + (item.photo.startsWith('uploads') ? item.photo : 'uploads/' + item.photo);
+                    }
+                } else {
+                    img.src = 'https://via.placeholder.com/60?text=No+Image';
+                }
+                img.alt = item.name;
+                img.loading = 'lazy';
+
+                const span = document.createElement('span');
+                span.textContent = `${item.name} x${item.qty} - Rp ${subTotal.toLocaleString()}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.onclick = () => {
+                    const updatedCart = cart.filter(cartItem => cartItem.id !== item.id);
+                    saveCart(updatedCart);
+                    renderCart();
+                };
+
+                li.appendChild(img);
+                li.appendChild(span);
+                li.appendChild(removeBtn);
+                cartItemsEl.appendChild(li);
+            });
+
+            cartTotalEl.textContent = `Total: Rp ${total.toLocaleString()}`;
+            checkoutBtn.style.display = 'inline-block';
+            cartTotalEl.style.display = 'block';
+            emptyMessage.style.display = 'none';
+
+            checkoutBtn.onclick = () => {
+                let message = 'Halo, saya ingin memesan:%0A';
+                cart.forEach(item => {
+                    message += `- ${item.name} x${item.qty} (Rp ${item.price.toLocaleString()})%0A`;
+                });
+                message += `%0ATotal: Rp ${total.toLocaleString()}%0A%0ATerima kasih.`;
+                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+            };
+        }
+
+        renderCart();
+    </script>
+</body>
+</html>

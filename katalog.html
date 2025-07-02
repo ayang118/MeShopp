@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MeShopp - Katalog</title>
+  <style>
+    :root {
+      --pink: #ff69b4;
+      --pink-dark: #e75480;
+      --bg-dark: #0a0a0a;
+      --bg-dark-alt: #1a1a1a;
+      --white: #fff;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, var(--bg-dark), var(--bg-dark-alt));
+      margin: 0;
+      padding: 0;
+      color: var(--pink);
+      scroll-behavior: smooth;
+    }
+    header {
+      background: linear-gradient(to right, var(--bg-dark), var(--bg-dark-alt));
+      color: var(--pink);
+      padding: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 2.2em;
+      text-align: left;
+      padding-left: 20px;
+      box-shadow: 0 4px 12px rgba(255,105,180,0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      position: relative;
+    }
+    .btn-kembali {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 0.4em;
+      background: var(--pink);
+      color: var(--white);
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(255,105,180,0.4);
+      transition: background 0.3s, transform 0.1s;
+    }
+    .btn-kembali:hover {
+      background: var(--pink-dark);
+    }
+    .btn-kembali:active {
+      transform: scale(0.95);
+    }
+    section {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 15px;
+    }
+    h2 {
+      color: var(--pink);
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--pink);
+      padding-bottom: 5px;
+      font-size: 1.3em;
+      text-align: center;
+    }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+    }
+    .product-card {
+      background: #111;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(255,105,180,0.2);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .product-card:active {
+      transform: scale(0.98);
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(255,105,180,0.4);
+    }
+    .product-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .product-card:hover img {
+      transform: scale(1.05);
+    }
+    .product-card-content {
+      padding: 10px;
+      text-align: center;
+      color: var(--pink);
+      flex-grow: 1;
+    }
+    .product-card-content h3 {
+      margin: 6px 0 4px;
+      font-size: 1em;
+    }
+    .product-card-content p {
+      margin: 0;
+      font-weight: bold;
+      color: var(--white);
+      font-size: 0.9em;
+    }
+    .button-group {
+      display: flex;
+      border-top: 1px solid #333;
+    }
+    .add-cart-btn,
+    .beli-sekarang-btn {
+      background: var(--pink);
+      border: none;
+      color: var(--white);
+      flex: 1;
+      padding: 8px 0;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.1s;
+      user-select: none;
+    }
+    .add-cart-btn:active,
+    .beli-sekarang-btn:active {
+      transform: scale(0.98);
+    }
+    .add-cart-btn:hover,
+    .beli-sekarang-btn:hover {
+      background: var(--pink-dark);
+    }
+    #go-to-cart-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--pink);
+      color: var(--white);
+      border: none;
+      border-radius: 50px;
+      padding: 12px 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(255,105,180,0.4);
+      transition: background 0.3s, transform 0.1s;
+      z-index: 999;
+    }
+    #go-to-cart-btn:hover {
+      background: var(--pink-dark);
+    }
+    #go-to-cart-btn:active {
+      transform: scale(0.97);
+    }
+    .loading,
+    .error {
+      color: var(--pink);
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      header {
+        font-size: 1.8em;
+        padding-left: 15px;
+      }
+    }
+    @media (max-width: 480px) {
+      header {
+        font-size: 1.5em;
+        padding-left: 10px;
+      }
+      .product-list {
+        grid-template-columns: 1fr 1fr;
+      }
+      .btn-kembali {
+        font-size: 0.5em;
+        top: 16px;
+        right: 10px;
+        padding: 3px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    MeShopp 🛍️✨
+    <a href="index.html" class="btn-kembali">🏠 Beranda</a>
+  </header>
+
+  <section>
+    <h2>🛍️ Semua Produk</h2>
+    <div id="normal-products" class="product-list">
+      <p class="loading">Loading produk katalog...</p>
+    </div>
+  </section>
+
+  <button id="go-to-cart-btn">🛒 Lihat Keranjang</button>
+
+  <script>
+    const BASE_URL = "https://fatimaazhr.psl17.my.id/";
+
+    function getCart() {
+      return JSON.parse(localStorage.getItem("cart") || "[]");
+    }
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    function renderProducts(containerId, products) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      products.forEach((p) => {
+        const item = document.createElement("div");
+        item.className = "product-card";
+
+        const photoPath = p.photo.startsWith("http")
+          ? p.photo
+          : BASE_URL + (p.photo.startsWith("uploads") ? p.photo : "uploads/" + p.photo);
+
+        item.innerHTML = `
+          <img src="${photoPath}" alt="${p.name}" loading="lazy" />
+          <div class="product-card-content">
+              <h3>🛍️ ${p.name}</h3>
+              <p>Rp ${Number(p.price).toLocaleString()}</p>
+          </div>
+          <div class="button-group">
+              <button class="add-cart-btn" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" data-photo="${p.photo}">🛒 Tambah</button>
+              <button class="beli-sekarang-btn" data-name="${p.name}" data-price="${p.price}">📲 Beli</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      container.querySelectorAll(".add-cart-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const id = button.dataset.id;
+          const name = button.dataset.name;
+          const price = Number(button.dataset.price);
+          const photo = button.dataset.photo;
+          let cart = getCart();
+          const exist = cart.find((item) => item.id === id);
+          if (exist) {
+            exist.qty++;
+          } else {
+            cart.push({ id, name, price, qty: 1, photo });
+          }
+          saveCart(cart);
+          alert(`"${name}" telah ditambahkan ke keranjang! 🛒✨`);
+        });
+      });
+
+      container.querySelectorAll(".beli-sekarang-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const name = button.dataset.name;
+          const price = Number(button.dataset.price).toLocaleString();
+          const message = `Halo, saya ingin beli sekarang:\nProduk: ${name}\nHarga: Rp ${price}`;
+          window.open(`https://wa.me/6285891941068?text=${encodeURIComponent(message)}`, "_blank");
+        });
+      });
+    }
+
+    fetch(BASE_URL + "api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          renderProducts("normal-products", data);
+        } else {
+          document.getElementById("normal-products").innerHTML = "<p class='error'>Tidak ada produk tersedia.</p>";
+        }
+      })
+      .catch((err) => {
+        document.getElementById("normal-products").innerHTML = "<p class='error'>Gagal memuat produk katalog.</p>";
+        console.error(err);
+      });
+
+    document.getElementById("go-to-cart-btn").addEventListener("click", () => {
+      window.location.href = "cart.html";
+    });
+  </script>
+</body>
+</html>
